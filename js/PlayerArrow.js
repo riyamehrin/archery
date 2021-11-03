@@ -6,13 +6,19 @@ class PlayerArrow {
     };
     this.width = width;
     this.height = height;
+    this.removed=false
     this.body = Bodies.rectangle(x, y, this.width, this.height, options);
     this.image = loadImage("./assets/arrow.png");
     this.archerAngle = archerAngle;
     this.velocity = 0;
     World.add(world, this.body);
   }
+  remove(i){
+    this.removed=true
+      Matter.World.remove(world,this.body);
+      delete playerArrows[i];
 
+  }
   shoot(archerAngle) {
     archerAngle += 90;
     this.velocity = p5.Vector.fromAngle(archerAngle * (3.14 / 180));

@@ -47,6 +47,8 @@ function setup() {
     100,
     10
   );
+  board1=new Board(width-300,330,50,200);
+  board2=new Board(width-550,height-300,50,200);
 }
 
 function draw() {
@@ -61,7 +63,18 @@ function draw() {
   if (keyCode === 32) {
     arrow.shoot(playerArcher.body.angle);
   }
-
+  board1.display();
+  board2.display();
+  for(var i=0;i<playerArrows.length;i++){
+  if(playerArrows[i]!==undefined){
+    playerArrows[i].display();
+    var collision = Matter.SAT.collides(board1.body,playerArrows[i].body);
+    var collision2 = Matter.SAT.collides(board2.body,playerArrows[i].body);
+    if(collision.collided || collision2.collided){
+      playerArrows[i].remove(i)
+    }
+  }
+  }
   // Title
   fill("#FFFF");
   textAlign("center");
