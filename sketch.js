@@ -7,8 +7,11 @@ var engine, world;
 var canvas,baseimage,playerimage;
 var palyer, playerBase, playerArcher;
 var playerArrows = [];
+var score = 0;
+var boardVerticalVelocity = 5;
+var numberOfArrows = 10;
 var board1, board2;
-var numOfArrows = 10;
+
 function preload() {
   backgroundImg = loadImage("./assets/background.png");
   baseimage = loadImage("./assets/base.png");
@@ -49,6 +52,8 @@ function draw() {
   image(playerimage,player.position.x,player.position.y,50,180)
 
   Engine.update(engine);
+
+
   playerArcher.display();
 
   board1.display();
@@ -58,18 +63,29 @@ function draw() {
     if (playerArrows[i] !== undefined) {
       playerArrows[i].display();
 
-      //[optional code to add trajectory of arrow]
-      
-      var posX = playerArrows[i].body.position.x;
-       var posY = playerArrows[i].body.position.y;
+      //with distance formula
+      d1 = dist(playerArrows[i].body.position.x,playerArrows[i].body.position.y, board1.body.position.x,board1.body.position.y)
+      if(d1<=100)
+      {
+        console.log("collision");
+      }
 
-       if (posX > width || posY > height) {
-         if (!playerArrows[i].isRemoved) {
-           playerArrows[i].remove(i);
-         } else {
-           playerArrows[i].trajectory = [];
-         }
-       }
+      var board1Collision = Matter.SAT.collides(
+        board1.body,
+        playerArrows[i].body
+      );
+
+      var board2Collision = Matter.SAT.collides(
+        board2.body,
+        playerArrows[i].body
+      );
+
+      if (board1Collision.collided || board2Collision.collided) {
+        score += 5;
+    
+      }
+
+      
     }
   }
 
@@ -79,11 +95,26 @@ function draw() {
   textSize(40);
   text("EPIC ARCHERY", width / 2, 100);
 
+  // Score
+  fill("#FFFF");
+  textAlign("center");
+  textSize(30);
+  text("Score " + score, width - 200, 100);
+
+  // Arrow Count
+  fill("#FFFF");
+  textAlign("center");
+  textSize(30);
+  text("Remaining Arrows : " + numberOfArrows, 200, 100);
+
+  if (numberOfArrows == 0) {
+    gameOver();
+  }
 }
 
 function keyPressed() {
   if (keyCode === 32) {
-    if(numOfArrows>0){
+    if (numberOfArrows > 0) {
       var posX = playerArcher.body.position.x;
       var posY = playerArcher.body.position.y;
       var angle = playerArcher.body.angle;
@@ -93,12 +124,10 @@ function keyPressed() {
       arrow.trajectory = [];
       Matter.Body.setAngle(arrow.body, angle);
       playerArrows.push(arrow);
-      numOfArrows-=1;
-
-    }
-     
+      numberOfArrows -= 1;
     }
   }
+}
 
 function keyReleased() {
   if (keyCode === 32) {
@@ -109,4 +138,20 @@ function keyReleased() {
   }
 }
 
-
+function gameOver() {
+  swal(
+    {
+      title: `Game Over!!!`,
+      text: "Thanks for playing!!",
+      imageUrl:
+        "https://raw.githubusercontent.com/vishalgaddam873/PiratesInvision/main/assets/board.png",
+      imageSize: "150x150",
+      confirmButtonText: "Play Again"
+    },
+    function(isConfirm) {
+      if (isConfirm) {
+        location.reload();
+      }
+    }
+  );
+}

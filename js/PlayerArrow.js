@@ -15,13 +15,11 @@ class PlayerArrow {
     World.add(world, this.body);
   }
 
-
-  //required for trajectory
-   remove(index) {
-     this.isRemoved = true;
-     Matter.World.remove(world, this.body);
+  remove(index) {
+    this.isRemoved = true;
+    Matter.World.remove(world, this.body);
     delete playerArrows[index];
-   }
+  }
 
   shoot(archerAngle) {
     archerAngle += 90;
