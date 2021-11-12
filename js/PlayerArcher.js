@@ -38,6 +38,3 @@ class PlayerArcher {
     pop();
   }
 }
-
-
-

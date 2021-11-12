@@ -4,12 +4,11 @@ const Bodies = Matter.Bodies;
 const Constraint = Matter.Constraint;
 
 var engine, world;
-var canvas;
+var canvas,baseimage,playerimage;
 var palyer, playerBase, playerArcher;
-var arrow;
-var baseimage;
-var playerimage;
-
+var playerArrows = [];
+var board1, board2;
+var numOfArrows = 10;
 function preload() {
   backgroundImg = loadImage("./assets/background.png");
   baseimage = loadImage("./assets/base.png");
@@ -21,7 +20,6 @@ function setup() {
 
   engine = Engine.create();
   world = engine.world;
-
   angleMode(DEGREES);
 
   var options = {
@@ -41,59 +39,66 @@ function setup() {
     120
   );
 
-  arrow = new PlayerArrow(
-    playerArcher.body.position.x,
-    playerArcher.body.position.y,
-    100,
-    10
-  );
-  board1=new Board(width-300,330,50,200);
-  board2=new Board(width-550,height-300,50,200);
+  board1 = new Board(width - 300, 330, 50, 200);
+  board2 = new Board(width - 550, height - 300, 50, 200);
 }
 
 function draw() {
-  background(backgroundImg);
+  background(backgroundImg );
   image(baseimage,playerBase.position.x,playerBase.position.y,180,150)
   image(playerimage,player.position.x,player.position.y,50,180)
+
   Engine.update(engine);
-
   playerArcher.display();
-  arrow.display();
 
-  if (keyCode === 32) {
-    arrow.shoot(playerArcher.body.angle);
-  }
   board1.display();
   board2.display();
-  for(var i=0;i<playerArrows.length;i++){
-  if(playerArrows[i]!==undefined){
-    playerArrows[i].display();
-    var collision = Matter.SAT.collides(board1.body,playerArrows[i].body);
-    var collision2 = Matter.SAT.collides(board2.body,playerArrows[i].body);
-    if(collision.collided || collision2.collided){
-      playerArrows[i].remove(i)
+
+  for (var i = 0; i < playerArrows.length; i++) {
+    if (playerArrows[i] !== undefined) {
+      playerArrows[i].display();
+
+      //[optional code to add trajectory of arrow]
+      
+      var posX = playerArrows[i].body.position.x;
+       var posY = playerArrows[i].body.position.y;
+
+       if (posX > width || posY > height) {
+         if (!playerArrows[i].isRemoved) {
+           playerArrows[i].remove(i);
+         } else {
+           playerArrows[i].trajectory = [];
+         }
+       }
     }
   }
-  }
+
   // Title
   fill("#FFFF");
   textAlign("center");
   textSize(40);
   text("EPIC ARCHERY", width / 2, 100);
+
 }
+
 function keyPressed() {
   if (keyCode === 32) {
-    var posX = playerArcher.body.position.x;
-    var posY = playerArcher.body.position.y;
-    var angle = playerArcher.body.angle;
-    //console.log(angle);
+    if(numOfArrows>0){
+      var posX = playerArcher.body.position.x;
+      var posY = playerArcher.body.position.y;
+      var angle = playerArcher.body.angle;
 
-    var arrow = new PlayerArrow(posX, posY, 100, 10, angle);
+      var arrow = new PlayerArrow(posX, posY, 100, 20, angle);
 
-    Matter.Body.setAngle(arrow.body, angle);
-    playerArrows.push(arrow);
+      arrow.trajectory = [];
+      Matter.Body.setAngle(arrow.body, angle);
+      playerArrows.push(arrow);
+      numOfArrows-=1;
+
+    }
+     
+    }
   }
-}
 
 function keyReleased() {
   if (keyCode === 32) {
@@ -103,3 +108,5 @@ function keyReleased() {
     }
   }
 }
+
+
